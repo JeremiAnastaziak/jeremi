@@ -1,27 +1,27 @@
 const retry = require('../retry');
 const delay = require('../delay');
-const expect =  require('chai').expect;
+const expect = require('chai').expect;
 const sinon = require('sinon');
-
 
 describe('retry', () => {
     [-100, -1, 0].forEach(invalidRetryCount => {
-        it('should re-throw error from rejected promise when retries count is lower or equal to zero',  async () => {
+        it('should re-throw error from rejected promise when retries count is lower or equal to zero', async () => {
             const rejectedPromise = () => Promise.reject('invalid input data');
 
-            await retry(rejectedPromise, { retries: invalidRetryCount }).catch(err => {
-                expect(err).to.be.equal('invalid input data');
-            });
+            await retry(rejectedPromise, { retries: invalidRetryCount }).catch(
+                err => {
+                    expect(err).to.be.equal('invalid input data');
+                }
+            );
         });
     });
 
     it('should retry 3 times given function when exception occurs', async () => {
         const spy = sinon.spy(() => Promise.reject('error'));
 
-        await retry(spy, { retries: 2, timeout: 10 }).catch(err => {
-                expect(spy.calledThrice).to.be.true;
-            }
-        )
+        await retry(spy, { retries: 2, timeout: 10 }).catch(err => {});
+
+        expect(spy.calledThrice).to.be.true;
     });
 
     it('should retry function after the time specified by timeout value', async () => {
@@ -47,7 +47,6 @@ describe('retry', () => {
         let count = 0;
         let resolveSpy = sinon.spy();
 
-        // eslint-disable-next-line no-plusplus
         const fun = sinon.spy(() => calls[count++]());
         await retry(fun, { retries: 5 }).then(resolveSpy);
 
@@ -55,4 +54,3 @@ describe('retry', () => {
         sinon.assert.calledOnce(resolveSpy);
     });
 });
-
